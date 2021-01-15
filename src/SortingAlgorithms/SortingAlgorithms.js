@@ -1,29 +1,4 @@
-
-
-
-// export const mergeSort = (array) =>{
-//     if(startIdx === endIdx)return;
-//     const middleIdx = Math.floor((1 + endIdx - startIdx) / 2);
-//     const arrayleft = mergeSort(array,startIdx,middleIdx,animations);
-//     const arrayright = mergeSort(array,middleIdx + 1,endIdx,animations);
-//     let i = startIdx,j = middleIdx + 1;
-//     const sortedArray = [];
-//     while(i < middleIdx + 1 && j < endIdx + 1){
-//         if(arrayright[j] < arrayleft[i]){
-//             sortedArray.push(arrayright[j]);
-//             j = j + 1;
-//         }
-//         else{
-//             sortedArray.push(arrayleft[i]);
-//             i = i + 1;
-//         }
-//     }
-//     while(i < arrayleft.length)sortedArray.push(arrayleft[i++]);
-//     while(j < arrayright.length)sortedArray.push(arrayright[j++]);
-//     return sortedArray;
-// };
-
-export function mergeSort(array){
+export function getMergeSortAnimations(array) {
     const animations = [];
     if(array.length <= 1)return array;
     const auxiliaryArray = array.slice();
@@ -54,32 +29,96 @@ function doMerge(
     animations,
 ){
     let k = startIdx;
-    let i = middleIdx;
-    let j = endIdx;
+    let i = startIdx;
+    let j = middleIdx + 1;
     while(i <= middleIdx && j <= endIdx){
-        const animation = {};
-        animation.comparison = [i,j];
+        animations.push([i,j]);
+        animations.push([i,j]);
         if(auxiliaryArray[i] <= auxiliaryArray[j]){
-            animation.swap = [k, i];
+            animations.push([k, auxiliaryArray[i]]);
             mainArray[k++] = auxiliaryArray[i++];
         }else{
-            animation.swap = [k,j];
+            animations.push([k,auxiliaryArray[j]]);
             mainArray[k++] = auxiliaryArray[j++];
         }
-        animations.push(animation)
     }
     while(i <= middleIdx){
-        animations.push({
-            comparison: [i,i],
-            swap: [k,i],
-        });
+        animations.push([i,i]);
+        animations.push([i,i]);
+        animations.push([k,auxiliaryArray[i]]);
         mainArray[k++] = auxiliaryArray[i++];
     }
     while(j <= endIdx){
-        animations.push({
-            comparison: [j,j],
-            swap: [k,j],
-        });
+        animations.push([j,j]);
+        animations.push([j,j]);
+        animations.push([k,auxiliaryArray[j]]);
         mainArray[k++] = auxiliaryArray[j++];
     }
+}
+
+
+export function getQuickSortAnimations(array) {
+    const animations = [];
+    if(array.length <= 1)return array;
+    quickSortHelper(array,0,array.length - 1,animations);
+    return animations
+}
+
+function quickSortHelper(
+    mainArray,
+    startIdx,
+    endIdx,
+    animations,
+){
+    if(endIdx > startIdx){
+        const pivotIdx = Math.floor((startIdx + endIdx) / 2);
+        const left = startIdx,right = endIdx;
+        const NewpivotIndx = partition(mainArray,left,right,pivotIdx,animations);
+        quickSortHelper(mainArray,left,NewpivotIndx - 1,animations);
+        quickSortHelper(mainArray,NewpivotIndx + 1,right,animations);
+    }
+
+}
+
+function partition(
+    mainArray,
+    left,
+    right,
+    pivotIdx,
+    animations,
+){
+    const pivotValue = mainArray[pivotIdx];
+    swapbar(mainArray,pivotIdx,right,animations);
+    animations.push([1,right,right]);
+
+    let storeIdx = left;
+    
+    for(let i = left;i < right;i++){
+        animations.push([1,i,i]);
+        if(mainArray[i] <= pivotValue){
+            swapbar(mainArray,storeIdx,i,animations);
+            storeIdx = storeIdx + 1;
+        }
+        animations.push([-1,i,i]);
+    }
+    swapbar(mainArray,right,storeIdx,animations);
+    return storeIdx;
+}
+
+//animations:
+//  1 : change bar's color which will use
+// -1 : retrieved the  color that used
+//  2 : overwrite the height of bar
+
+function swapbar(
+    mainArray,
+    a,
+    b,
+    animations,
+){
+    animations.push([1,a,b]);
+    animations.push([2,a,mainArray[b]]);
+    animations.push([2,b,mainArray[a]]);
+    [mainArray[a],mainArray[b]] = [mainArray[b],mainArray[a]];
+    animations.push([-1,a,b]);
 }
