@@ -3,7 +3,7 @@ export function getMergeSortAnimations(array) {
     if(array.length <= 1)return array;
     const auxiliaryArray = array.slice();
     mergeSortHelper(array,0,array.length - 1,auxiliaryArray,animations);
-    return animations;
+    return animations
 }
 
 function mergeSortHelper(
@@ -61,6 +61,7 @@ export function getQuickSortAnimations(array) {
     const animations = [];
     if(array.length <= 1)return array;
     quickSortHelper(array,0,array.length - 1,animations);
+    complete(array, 0, array.length - 1,animations)
     return animations
 }
 
@@ -106,8 +107,9 @@ function partition(
 }
 
 //animations:
-//  1 : change bar's color which will use
-// -1 : retrieved the  color that used
+//  1 : change bar's color which will use second
+// -1 : change bar's color which will use first
+//  3 : change bar's color which will use third
 //  2 : overwrite the height of bar
 
 function swapbar(
@@ -121,4 +123,76 @@ function swapbar(
     animations.push([2,b,mainArray[a]]);
     [mainArray[a],mainArray[b]] = [mainArray[b],mainArray[a]];
     animations.push([-1,a,b]);
+}
+
+export function getBubbleSortAnimations(array){
+    const animations = [];
+    if(array.length <= 1)return array;
+    bubbleSortHelper(array,0,array.length - 1,animations);
+    return animations
+}
+
+function bubbleSortHelper(mainArray, startIdx, endIDx, animations){
+    for(let i = startIdx;i < endIDx;i++){
+        for(let j = startIdx;j < endIDx - i;j++){
+            animations.push([1, j, j + 1])
+            if(mainArray[j] > mainArray[j + 1]){
+                swapbar(mainArray, j, j + 1, animations)
+            }
+            animations.push([-1, j, j + 1])
+        }
+    }
+    complete(mainArray, startIdx, endIDx,animations)
+}
+
+export function getSelectionSortAnimations(array){
+    const animations = [];
+    if(array.length <= 1)return array;
+    selectionSortHelper(array,0,array.length - 1,animations);
+    return animations
+}
+
+function selectionSortHelper(mainArray, startIdx, endIDx, animations){
+    for(let i = startIdx;i < endIDx;i++){
+        let max = i
+        animations.push([1, i, i])
+        for(let j = i + 1;j <= endIDx;j++){
+            animations.push([1, j, j])
+            if(mainArray[j] < mainArray[max]){
+                animations.push([3, j, j])
+                animations.push([-1, max, max])
+                max = j
+            }
+            else{
+                animations.push([-1, j, j])
+            }
+        }
+        swapbar(mainArray, i, max, animations)
+    }
+    complete(mainArray, startIdx, endIDx,animations)
+}
+
+export function getInsertionSortAnimations(array){
+    const animations = [];
+    if(array.length <= 1)return array;
+    insertionSortHelper(array,0,array.length - 1,animations);
+    return animations
+}
+
+function insertionSortHelper(mainArray, startIdx, endIDx, animations){
+    for(let i = startIdx + 1;i <= endIDx;i++){
+        let j = i
+        while(j > 0 && mainArray[j] < mainArray[j - 1]){
+            swapbar(mainArray, j, j - 1, animations)
+            j--
+        }
+    }
+    complete(mainArray, startIdx, endIDx,animations)
+}
+
+function complete(mainArray, startIdx, endIdx, animations){
+    for(let i = startIdx;i <= endIdx;i++){
+        animations.push([1, i, i])
+        animations.push([-1, i, i])
+    }
 }
